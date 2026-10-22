@@ -67,8 +67,13 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    products: Product;
+    'product-categories': ProductCategory;
+    processes: Process;
+    partners: Partner;
     media: Media;
+    redirects: Redirect;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,20 +81,45 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
+    processes: ProcessesSelect<false> | ProcessesSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
-  fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
-  locale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('tr' | 'en') | ('tr' | 'en')[];
+  globals: {
+    'home-page': HomePage;
+    'about-page': AboutPage;
+    'products-page': ProductsPage;
+    'partners-page': PartnersPage;
+    'contact-page': ContactPage;
+    'quote-page': QuotePage;
+    'privacy-page': PrivacyPage;
+    'site-settings': SiteSetting;
+    'email-settings': EmailSetting;
+  };
+  globalsSelect: {
+    'home-page': HomePageSelect<false> | HomePageSelect<true>;
+    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'products-page': ProductsPageSelect<false> | ProductsPageSelect<true>;
+    'partners-page': PartnersPageSelect<false> | PartnersPageSelect<true>;
+    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
+    'quote-page': QuotePageSelect<false> | QuotePageSelect<true>;
+    'privacy-page': PrivacyPageSelect<false> | PrivacyPageSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'email-settings': EmailSettingsSelect<false> | EmailSettingsSelect<true>;
+  };
+  locale: 'tr' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -119,10 +149,255 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  name: string;
+  category: number | ProductCategory;
+  code?: string | null;
+  cas?: string | null;
+  /**
+   * Digits are subscripted automatically.
+   */
+  formula?: string | null;
+  /**
+   * Shown as catalogue filters.
+   */
+  processes?: (number | Process)[] | null;
+  /**
+   * One or two sentences shown on cards.
+   */
+  summary?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  coverImage?: (number | null) | Media;
+  gallery?: (number | Media)[] | null;
+  specs?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  packaging?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  origin?: string | null;
+  unit?: ('kg' | 'ton' | 'lt' | 'pcs') | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * Generated from the name when left empty. Old URLs redirect automatically when changed.
+   */
+  slug?: string | null;
+  /**
+   * Visitors are redirected to the current URL.
+   */
+  previousSlugs?: string[] | null;
+  isActive?: boolean | null;
+  featured?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories".
+ */
+export interface ProductCategory {
+  id: number;
+  name: string;
+  /**
+   * Generated from the name when left empty. Old URLs redirect automatically when changed.
+   */
+  slug?: string | null;
+  /**
+   * Visitors are redirected to the current URL.
+   */
+  previousSlugs?: string[] | null;
+  image?: (number | null) | Media;
+  summary?: string | null;
+  order?: number | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Short description of the image (accessibility & SEO).
+   */
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    wide?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    logo?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Used as a filter in the product catalogue.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processes".
+ */
+export interface Process {
+  id: number;
+  name: string;
+  /**
+   * Generated from the name when left empty. Old URLs redirect automatically when changed.
+   */
+  slug?: string | null;
+  /**
+   * Visitors are redirected to the current URL.
+   */
+  previousSlugs?: string[] | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Upload a logo and an optional card photo for each partner.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  /**
+   * Transparent PNG/SVG recommended.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Card background photo (landscape, 1200px+).
+   */
+  image?: (number | null) | Media;
+  /**
+   * Light plate for dark logos, dark plate for white logos.
+   */
+  logoPlate?: ('light' | 'dark') | null;
+  grayscale?: boolean | null;
+  relation: 'supplier' | 'customer';
+  country?: string | null;
+  website?: string | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Map old URLs to new ones. Takes effect within a minute.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Full URLs are accepted; the domain is stripped.
+   */
+  from: string;
+  /**
+   * Internal path or full URL.
+   */
+  to: string;
+  type?: ('301' | '302') | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  name?: string | null;
+  /**
+   * Editors manage content; admins also manage users and quote recipients.
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -130,6 +405,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -144,29 +420,10 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -183,20 +440,40 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'product-categories';
+        value: number | ProductCategory;
+      } | null)
+    | ({
+        relationTo: 'processes';
+        value: number | Process;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -206,10 +483,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -229,7 +506,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -237,25 +514,98 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "products_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  code?: T;
+  cas?: T;
+  formula?: T;
+  processes?: T;
+  summary?: T;
+  description?: T;
+  coverImage?: T;
+  gallery?: T;
+  specs?:
     | T
     | {
+        label?: T;
+        value?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
       };
+  packaging?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  origin?: T;
+  unit?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  slug?: T;
+  previousSlugs?: T;
+  isActive?: T;
+  featured?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  previousSlugs?: T;
+  image?: T;
+  summary?: T;
+  order?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processes_select".
+ */
+export interface ProcessesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  previousSlugs?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  image?: T;
+  logoPlate?: T;
+  grayscale?: T;
+  relation?: T;
+  country?: T;
+  website?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -274,6 +624,97 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        wide?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        logo?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -314,6 +755,750 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page".
+ */
+export interface HomePage {
+  id: number;
+  heroTitle?: string | null;
+  heroSubtitle?: string | null;
+  /**
+   * Add photos or short mp4 videos.
+   */
+  slides?:
+    | {
+        image: number | Media;
+        video?: (number | null) | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  hubName?: string | null;
+  hubLat?: number | null;
+  hubLng?: number | null;
+  /**
+   * Right-click a city on Google Maps to copy coordinates.
+   */
+  routes?:
+    | {
+        label: string;
+        direction: 'import' | 'export';
+        lat: number;
+        lng: number;
+        id?: string | null;
+      }[]
+    | null;
+  stats?:
+    | {
+        value: number;
+        suffix?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Drag rows to reorder the sections below the slider; untick "Visible" to hide one.
+   */
+  layout?:
+    | {
+        section: 'partners' | 'stats' | 'categories' | 'featured' | 'showcase' | 'gallery' | 'cta';
+        visible?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  categoriesSection?: {
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  /**
+   * Products marked as "Featured" appear here (max 8). Hidden when none.
+   */
+  featuredSection?: {
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  showcase?: {
+    image?: (number | null) | Media;
+    video?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  gallery?: {
+    title?: string | null;
+    images?: (number | Media)[] | null;
+  };
+  partnersSection?: {
+    title?: string | null;
+  };
+  cta?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    buttonLabel?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  hero?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  intro?: string | null;
+  story?:
+    | {
+        image: number | Media;
+        title?: string | null;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  timeline?:
+    | {
+        year: string;
+        title: string;
+        id?: string | null;
+      }[]
+    | null;
+  values?:
+    | {
+        icon?: ('globe' | 'ship' | 'warehouse' | 'handshake' | 'shield' | 'clock') | null;
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  gallery?: {
+    title?: string | null;
+    images?: (number | Media)[] | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products-page".
+ */
+export interface ProductsPage {
+  id: number;
+  hero?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  catalog?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners-page".
+ */
+export interface PartnersPage {
+  id: number;
+  hero?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page".
+ */
+export interface ContactPage {
+  id: number;
+  hero?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  formTitle?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-page".
+ */
+export interface QuotePage {
+  id: number;
+  hero?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  successMessage?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy-page".
+ */
+export interface PrivacyPage {
+  id: number;
+  title: string;
+  /**
+   * Privacy notice approved by your legal advisor.
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  lastUpdated?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  siteName?: string | null;
+  tagline?: string | null;
+  logo?: (number | null) | Media;
+  logoLight?: (number | null) | Media;
+  footerNote?: string | null;
+  address?: string | null;
+  phones?:
+    | {
+        number: string;
+        id?: string | null;
+      }[]
+    | null;
+  emails?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  mapLat?: number | null;
+  mapLng?: number | null;
+  socials?:
+    | {
+        platform: 'linkedin' | 'instagram' | 'facebook' | 'youtube' | 'x';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Include the country code.
+   */
+  whatsappNumber?: string | null;
+  /**
+   * Pre-filled in the visitor’s message box.
+   */
+  whatsappMessage?: string | null;
+  /**
+   * Only admins can change this.
+   */
+  quoteRecipients?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * How quote, contact and admin e-mails are sent.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-settings".
+ */
+export interface EmailSetting {
+  id: number;
+  /**
+   * Prefer the Microsoft 365 or Google Workspace connection; password-based SMTP is being retired by both.
+   */
+  provider: 'env' | 'smtp' | 'microsoft' | 'google';
+  /**
+   * Must be the sending mailbox or its alias.
+   */
+  fromAddress?: string | null;
+  fromName?: string | null;
+  smtp?: {
+    /**
+     * Gmail requires an app password. Microsoft 365 basic-auth SMTP is being retired (end of 2026).
+     */
+    preset?: ('office365' | 'gmail' | 'yandex' | 'custom') | null;
+    host?: string | null;
+    port?: number | null;
+    security?: ('starttls' | 'ssl' | 'none') | null;
+    user?: string | null;
+    /**
+     * Stored value is never shown. Enter a new one to replace it.
+     */
+    passwordInput?: string | null;
+    passwordSaved?: boolean | null;
+    passwordClear?: boolean | null;
+    passwordEnc?: string | null;
+  };
+  /**
+   * Register an Entra app + client secret; grant Mail.Send scoped to one mailbox via Exchange RBAC for Applications (recommended) or tenant-wide in Entra.
+   */
+  microsoft?: {
+    tenantId?: string | null;
+    clientId?: string | null;
+    /**
+     * Stored value is never shown. Enter a new one to replace it.
+     */
+    clientSecretInput?: string | null;
+    clientSecretSaved?: boolean | null;
+    clientSecretClear?: boolean | null;
+    clientSecretEnc?: string | null;
+    /**
+     * Mailbox the e-mails are sent from.
+     */
+    senderMailbox?: string | null;
+  };
+  /**
+   * Service account with domain-wide delegation, scope gmail.send only.
+   */
+  google?: {
+    /**
+     * Stored value is never shown. Enter a new one to replace it.
+     */
+    serviceAccountInput?: string | null;
+    serviceAccountSaved?: boolean | null;
+    serviceAccountClear?: boolean | null;
+    serviceAccountEnc?: string | null;
+    /**
+     * Read from the key.
+     */
+    serviceAccountEmail?: string | null;
+    /**
+     * Use for domain-wide delegation.
+     */
+    serviceClientId?: string | null;
+    /**
+     * Workspace user to send as.
+     */
+    senderMailbox?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page_select".
+ */
+export interface HomePageSelect<T extends boolean = true> {
+  heroTitle?: T;
+  heroSubtitle?: T;
+  slides?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+        caption?: T;
+        id?: T;
+      };
+  hubName?: T;
+  hubLat?: T;
+  hubLng?: T;
+  routes?:
+    | T
+    | {
+        label?: T;
+        direction?: T;
+        lat?: T;
+        lng?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        suffix?: T;
+        label?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        section?: T;
+        visible?: T;
+        id?: T;
+      };
+  categoriesSection?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+      };
+  featuredSection?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+      };
+  showcase?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  gallery?:
+    | T
+    | {
+        title?: T;
+        images?: T;
+      };
+  partnersSection?:
+    | T
+    | {
+        title?: T;
+      };
+  cta?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        buttonLabel?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  intro?: T;
+  story?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  timeline?:
+    | T
+    | {
+        year?: T;
+        title?: T;
+        id?: T;
+      };
+  values?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  gallery?:
+    | T
+    | {
+        title?: T;
+        images?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products-page_select".
+ */
+export interface ProductsPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  catalog?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners-page_select".
+ */
+export interface PartnersPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  formTitle?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-page_select".
+ */
+export interface QuotePageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  successMessage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy-page_select".
+ */
+export interface PrivacyPageSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  lastUpdated?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  tagline?: T;
+  logo?: T;
+  logoLight?: T;
+  footerNote?: T;
+  address?: T;
+  phones?:
+    | T
+    | {
+        number?: T;
+        id?: T;
+      };
+  emails?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  mapLat?: T;
+  mapLng?: T;
+  socials?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  whatsappNumber?: T;
+  whatsappMessage?: T;
+  quoteRecipients?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-settings_select".
+ */
+export interface EmailSettingsSelect<T extends boolean = true> {
+  provider?: T;
+  fromAddress?: T;
+  fromName?: T;
+  smtp?:
+    | T
+    | {
+        preset?: T;
+        host?: T;
+        port?: T;
+        security?: T;
+        user?: T;
+        passwordInput?: T;
+        passwordSaved?: T;
+        passwordClear?: T;
+        passwordEnc?: T;
+      };
+  microsoft?:
+    | T
+    | {
+        tenantId?: T;
+        clientId?: T;
+        clientSecretInput?: T;
+        clientSecretSaved?: T;
+        clientSecretClear?: T;
+        clientSecretEnc?: T;
+        senderMailbox?: T;
+      };
+  google?:
+    | T
+    | {
+        serviceAccountInput?: T;
+        serviceAccountSaved?: T;
+        serviceAccountClear?: T;
+        serviceAccountEnc?: T;
+        serviceAccountEmail?: T;
+        serviceClientId?: T;
+        senderMailbox?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

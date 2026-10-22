@@ -1,0 +1,30 @@
+# Yerel geliştirme servisleri: PostgreSQL + Mailpit (test e-posta kutusu)
+# Kullanım: docker compose -f docker-compose.dev.yml up -d
+name: galvano-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: galvano
+      POSTGRES_PASSWORD: galvano_dev
+      POSTGRES_DB: galvano
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U galvano -d galvano']
+      interval: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:1025:1025' # SMTP
+      - '127.0.0.1:8025:8025' # Web arayüzü: http://localhost:8025
+
+volumes:
+  pgdata:

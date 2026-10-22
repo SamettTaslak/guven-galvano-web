@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /*
+   * Logo paleti: "GÜVEN" mavisi + G kıvrımının metalik grafiti.
+   * Koyu tonlar saf siyah yerine hafif mavi tonlu grafit; böylece logo mavisiyle aynı aileden görünür.
+   */
+  --color-ink-950: #0a1118;
+  --color-ink-900: #111a23;
+  --color-ink-800: #1b2732;
+  --color-ink-700: #283745;
+  --color-steel-500: #63717f;
+  --color-steel-300: #b6c2cd;
+  --color-steel-100: #e8eef3;
+  --color-paper: #f4f7fa;
+
+  --color-brand-800: #063a5c;
+  --color-brand-700: #074a75;
+  --color-brand-600: #0a5a8c;
+  --color-brand-500: #1170ab; /* logo mavisi, beyaz zeminde AA kontrast */
+  --color-brand-400: #3b9ad8; /* koyu zeminde vurgu / ihracat rotaları */
+  --color-brand-300: #8ec5ea; /* koyu zeminde küçük yazı */
+  --color-brand-100: #e3f0fa;
+  --color-silver-300: #dbe2e8; /* ithalat rotaları (metalik gümüş) */
+
+  /* Yumuşak geçişler: tüm hover/odak geçişleri varsayılan olarak bu süre ve eğriyi kullanır. */
+  --default-transition-duration: 450ms;
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-paper text-ink-900 font-sans;
+    overflow-x: clip;
+  }
+  ::selection {
+    @apply bg-brand-500 text-white;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-400;
+  }
+}
+
+@utility container-x {
+  @apply mx-auto w-full max-w-[1440px] px-4 md:px-8 lg:px-12;
+}
+@utility eyebrow {
+  @apply font-display text-xs font-semibold uppercase tracking-[0.25em] text-brand-500;
+}
+@utility h-display {
+  @apply font-display font-bold tracking-tight;
+}
+
+/* Logo kıvrımındaki geçişe benzer marka degradesi */
+@utility bg-brand-gradient {
+  background-image: linear-gradient(120deg, var(--color-brand-700) 0%, var(--color-brand-500) 55%, var(--color-brand-400) 100%);
+}
+/* Koyu bölümler için metalik grafit (G kıvrımının gri kısmı) + hafif mavi ışık */
+@utility bg-metal {
+  background-color: var(--color-ink-900);
+  background-image:
+    radial-gradient(120% 80% at 85% 0%, rgb(17 112 171 / 0.18) 0%, transparent 55%),
+    radial-gradient(90% 70% at 0% 100%, rgb(59 154 216 / 0.08) 0%, transparent 60%),
+    linear-gradient(160deg, var(--color-ink-800) 0%, var(--color-ink-900) 45%, var(--color-ink-950) 100%);
+}
+/* İnce marka çizgisi (bölüm ayırıcı, menü alt kenarı) */
+@utility brand-rule {
+  background-image: linear-gradient(90deg, transparent, var(--color-brand-400) 30%, var(--color-brand-500) 70%, transparent);
+  height: 1px;
+}
+@utility text-brand-gradient {
+  background-image: linear-gradient(100deg, var(--color-brand-300) 0%, var(--color-brand-400) 60%, var(--color-silver-300) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3.5 font-display text-sm font-semibold transition-all duration-500 ease-soft disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-brand {
+  @apply btn bg-brand-gradient text-white shadow-[0_8px_24px_-12px_rgb(17_112_171/0.7)] hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-12px_rgb(17_112_171/0.85)] hover:brightness-110;
+}
+@utility btn-ghost {
+  @apply btn border border-white/25 text-white backdrop-blur-sm hover:border-brand-300/70 hover:bg-white/10;
+}
+@utility btn-dark {
+  @apply btn bg-ink-900 text-white hover:-translate-y-0.5 hover:bg-ink-800;
+}
+@utility field {
+  @apply w-full rounded-lg border border-steel-300/60 bg-white px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-steel-500 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10;
+}
+
+@utility marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+  }
+}
