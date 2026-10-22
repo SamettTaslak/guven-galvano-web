@@ -40,7 +40,8 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith('/api/')) return (await guardAuthEndpoint(request)) ?? NextResponse.next()
 
   // 1) Elle tanımlı yönlendirmeler (sorgu dizesiyle tam eşleşme önce, sonra yalnız yol)
-  const rules = await loadRules(request.nextUrl.origin)
+  // Konteynerde kurallar ters vekile gitmeden doğrudan uygulamadan okunur (INTERNAL_URL).
+  const rules = await loadRules(process.env.INTERNAL_URL || request.nextUrl.origin)
   if (rules.size) {
     const { path, withQuery } = normalize(pathname, search)
     const rule = rules.get(withQuery) ?? rules.get(path)

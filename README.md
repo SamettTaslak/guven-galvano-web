@@ -156,5 +156,52 @@ src/
 - `site-settings` global’i (alıcı adresleri) dış API’ye kapalıdır.
 - Admin: 5 hatalı denemede 10 dk kilit.
 
-## 3. Yayına alma
-Linux sunucuda Docker ile yayına alma ayrı aşamada yapılacaktır. Ters proxy’de (nginx) `client_max_body_size 300m;` ayarlanmalıdır (`output: 'standalone'` hazır; medya klasörü `MEDIA_DIR` ile kalıcı volume’a bağlanır; üretimde şema `payload migrate` ile yönetilir).
+## 3. Sunucuya kurulum (Docker)
+Site, sunucuda iki konteynerle çalışır: `web` (site + panel) ve `db` (PostgreSQL). Adres: **https://ch5.chainasc.com**, yerel port: **5081** (5080 portal tarafından kullanılıyor).
+
+**1) Yerelde içeriği paketleyin** (ürünler, sayfalar, ayarlar ve yüklenen görseller):
+```bash
+bash scripts/export-content.sh
+```
+`deploy-data/content.sql` ve `deploy-data/media.tar.gz` oluşur. Bu dosyalar git'e girmez (kullanıcı ve ayar bilgisi içerir); sunucuya scp vb. ile kopyalayın.
+
+**2) Sunucuda projeyi alın ve ayarları yazın:**
+```bash
+git clone https://github.com/SamettTaslak/guven-galvano-web.git && cd guven-galvano-web
+cp .env.production.example .env   # PAYLOAD_SECRET (yereldeki ile aynı) ve POSTGRES_PASSWORD yazın
+```
+
+**3) Derleyip başlatın** — ilk açılışta tablolar migration ile otomatik kurulur:
+```bash
+docker compose up -d --build
+docker compose logs -f web
+```
+
+**4) İçeriği yükleyin** (`deploy-data/` klasörü proje klasöründe olmalı; mevcut içeriğin yerine geçer):
+```bash
+bash scripts/import-content.sh
+```
+
+**5) Nginx** — ch5.chainasc.com için sunucu bloğu (sertifika mevcut düzene göre, ör. certbot):
+```nginx
+server {
+    server_name ch5.chainasc.com;
+    client_max_body_size 300m;          # MAX_UPLOAD_MB ile aynı
+    location / {
+        proxy_pass http://127.0.0.1:5081;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;   # giriş denemesi sınırı gerçek IP'yi buradan okur
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 300s;
+    }
+    listen 443 ssl;   # + ssl_certificate satırları
+}
+```
+
+**Güncelleme:** `git pull && docker compose up -d --build` (yeni migration'lar açılışta uygulanır). Kod tarafında şema değişirse yerelde `npx payload migrate:create <ad>` ile migration üretilip commit edilmelidir.
+
+**Yedek:** `docker compose exec -T db pg_dump -U galvano galvano > yedek.sql` ve medya birimi (`guven-galvano-web_media`).

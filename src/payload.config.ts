@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { BRAND_NAME } from './lib/brand'
+import { migrations } from './migrations'
 import { panelEmailAdapter } from './lib/email-adapter'
 import { seoPluginConfig } from './lib/seo-config'
 import { Media } from './collections/Media'
@@ -28,7 +29,7 @@ const dirname = path.dirname(filename)
 
 // Panel ve API'ye istek yapabilecek kökenler: sitenin adresi (+ geliştirmede localhost).
 const SITE_ORIGINS = [
-  process.env.NEXT_PUBLIC_SERVER_URL,
+  process.env.NEXT_PUBLIC_SERVER_URL?.replace(/\/+$/, ''),
   ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000', 'http://127.0.0.1:3000'] : []),
 ].filter((v): v is string => Boolean(v))
 
@@ -42,7 +43,7 @@ const requireEnv = (key: string): string => {
 }
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
+  serverURL: (process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/+$/, ''),
   // Çerezle kimlik doğrulamada yalnızca sitenin kendi adresinden gelen istekler kabul edilir (CSRF koruması).
   csrf: SITE_ORIGINS,
   cors: SITE_ORIGINS,
@@ -86,6 +87,8 @@ export default buildConfig({
     pool: { connectionString: requireEnv('DATABASE_URL') },
     // Şema, geliştirmede otomatik; üretimde migration ile yönetilir.
     push: process.env.NODE_ENV !== 'production',
+    // Üretimde sunucu açılırken bekleyen migration'lar otomatik uygulanır (src/migrations).
+    prodMigrations: migrations,
   }),
   // Gönderim yöntemi panelden seçilir (Ayarlar → E-posta Gönderimi); .env yalnızca varsayılandır.
   email: panelEmailAdapter({

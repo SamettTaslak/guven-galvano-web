@@ -1,0 +1,70 @@
+# Güven Galvano Kimyasalları web sitesi — Docker Compose (üretim)
+#
+# Gereksinimler: Docker Engine 24+ ve Docker Compose v2. Node.js ya da veritabanı sunucusu kurmanız gerekmez.
+#
+# Kullanım:
+#   1) .env.production.example dosyasını .env adıyla kopyalayın; en az PAYLOAD_SECRET ve POSTGRES_PASSWORD yazın.
+#   2) docker compose up -d --build
+#   3) İlk açılışta veritabanı tabloları otomatik kurulur:  docker compose logs -f web
+#   4) İçerik aktarımı (yerel bilgisayardaki ürünler, sayfalar, görseller): README → "Sunucuya kurulum"
+#   5) Site: SITE_URL   Yönetim paneli: SITE_URL/admin
+#
+# Uygulama yalnızca 127.0.0.1:WEB_PORT'tan dinler; dışarıya HTTPS sağlayan ters vekil (Nginx vb.) ile açılır.
+# Veriler adlandırılmış birimlerde (volume) kalır; "docker compose down" silmez.
+# Her şeyi sıfırlamak için: docker compose down -v
+
+name: guven-galvano-web
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${SITE_URL:-https://ch5.chainasc.com}
+    image: guven-galvano-web:latest
+    container_name: guven-galvano-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:${WEB_PORT:-5081}:3000'
+    environment:
+      TZ: ${TZ:-Europe/Istanbul}
+      NEXT_PUBLIC_SERVER_URL: ${SITE_URL:-https://ch5.chainasc.com}
+      DATABASE_URL: postgres://galvano:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasında tanımlanmalı}@db:5432/galvano
+      # Panelde kayıtlı e-posta şifreleri bu anahtarla şifrelenir; kurulumdan sonra değiştirmeyin.
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?PAYLOAD_SECRET .env dosyasında tanımlanmalı (en az 32 karakter)}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-300}
+      # Varsayılan SMTP — yalnızca panelde "Sunucu varsayılanı" seçiliyken kullanılır.
+      # Gönderim normalde panelden ayarlanır: Ayarlar → E-posta Gönderimi.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - media:/app/media
+
+  db:
+    image: postgres:16-alpine
+    container_name: guven-galvano-db
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Istanbul}
+      POSTGRES_USER: galvano
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasında tanımlanmalı}
+      POSTGRES_DB: galvano
+    # Veritabanı dışarıya açılmaz; yalnızca "web" konteyneri erişir.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U galvano -d galvano']
+      interval: 5s
+      retries: 20
+
+volumes:
+  pgdata:
+  media:

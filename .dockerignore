@@ -1,0 +1,16 @@
+# İmaja girmeyecekler (derleme bağlamını küçük ve gizli bilgilerden arınmış tutar)
+node_modules
+.next
+media
+assets
+deploy-data
+.env
+.env.*
+!.env.example
+test.env
+tests
+test-results
+playwright-report
+*.tsbuildinfo
+.git
+.vscode
