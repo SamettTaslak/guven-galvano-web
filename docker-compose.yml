@@ -13,7 +13,7 @@
 # Veriler adlandırılmış birimlerde (volume) kalır; "docker compose down" silmez.
 # Her şeyi sıfırlamak için: docker compose down -v
 
-name: guven-galvano-web
+name: galvano-site
 
 services:
   web:
@@ -22,8 +22,8 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_SERVER_URL: ${SITE_URL:-https://ch5.chainasc.com}
-    image: guven-galvano-web:latest
-    container_name: guven-galvano-web
+    image: galvano-site:latest
+    container_name: galvano-site-web
     restart: unless-stopped
     depends_on:
       db:
@@ -50,7 +50,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: guven-galvano-db
+    container_name: galvano-site-db
     restart: unless-stopped
     environment:
       TZ: ${TZ:-Europe/Istanbul}

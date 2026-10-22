@@ -204,4 +204,4 @@ server {
 
 **Güncelleme:** `git pull && docker compose up -d --build` (yeni migration'lar açılışta uygulanır). Kod tarafında şema değişirse yerelde `npx payload migrate:create <ad>` ile migration üretilip commit edilmelidir.
 
-**Yedek:** `docker compose exec -T db pg_dump -U galvano galvano > yedek.sql` ve medya birimi (`guven-galvano-web_media`).
+**Yedek:** `docker compose exec -T db pg_dump -U galvano galvano > yedek.sql` ve medya birimi (`galvano-site_media`).
