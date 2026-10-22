@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
@@ -58,7 +58,7 @@
   @apply font-display text-xs font-semibold uppercase tracking-[0.25em] text-brand-500;
 }
 @utility h-display {
-  @apply font-display font-bold tracking-tight;
+  @apply font-display font-bold tracking-[-0.02em];
 }
 
 /* Logo kıvrımındaki geçişe benzer marka degradesi */

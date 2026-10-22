@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono, Sora } from 'next/font/google'
+import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
@@ -15,7 +15,8 @@ import { JsonLd, absoluteUrl, siteUrl } from '@/lib/seo'
 import { normalizeWhatsapp } from '@/lib/whatsapp'
 import '../globals.css'
 
-const sora = Sora({ subsets: ['latin', 'latin-ext'], variable: '--font-sora', display: 'swap' })
+// Başlıklar: Türkçe karakterlerde dengeli, kurumsal bir grotesk.
+const display = Plus_Jakarta_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-display-face', display: 'swap' })
 const inter = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-inter', display: 'swap' })
 const mono = JetBrains_Mono({ subsets: ['latin', 'latin-ext'], variable: '--font-jetbrains', display: 'swap' })
 
@@ -67,7 +68,7 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale} className={`${sora.variable} ${inter.variable} ${mono.variable}`} data-scroll-behavior="smooth">
+    <html lang={locale} className={`${display.variable} ${inter.variable} ${mono.variable}`} data-scroll-behavior="smooth">
       <body>
         <JsonLd data={organizationLd} />
         <CartProvider>

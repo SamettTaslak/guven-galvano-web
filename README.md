@@ -120,7 +120,7 @@ npm run dev                     # http://localhost:3000  ·  panel: /admin
 
 - Gönderilen e-postalar yerelde **Mailpit**’te görünür: http://localhost:8025
 - Örnek içeriği sıfırdan yüklemek: `npm run seed -- --reset`
-- Tekil güncellemeler: `npm run media:stock` (stok fotoğraflar), `npm run media:real` (assets/real altındaki gerçek ürün/depo fotoğrafları; `node scripts/real-photos.cjs "<klasör>"` ile hazırlanır), `npm run brand:apply` (logolar), `npm run privacy:apply` (KVKK şablonu), `npm run catalog:apply` (prosesler, CAS/formül, WhatsApp), `npm run partners:apply` (örnek firma logoları)
+- Tekil güncellemeler: `npm run media:stock` (stok fotoğraflar), `npm run about:apply` (Hakkımızda sayfasının ayrıntılı içeriği), `npm run media:real` (assets/real altındaki gerçek ürün/depo fotoğrafları; `node scripts/real-photos.cjs "<klasör>"` ile hazırlanır), `npm run brand:apply` (logolar), `npm run privacy:apply` (KVKK şablonu), `npm run catalog:apply` (prosesler, CAS/formül, WhatsApp), `npm run partners:apply` (örnek firma logoları)
 - SEO: `/sitemap.xml` ve `/robots.txt` otomatik üretilir (`NEXT_PUBLIC_SERVER_URL` canlı alan adı olmalı)
 - İçerik modeli değişince: `npm run generate:types` (ve admin bileşeni eklendiyse `npm run generate:importmap`)
 

@@ -860,6 +860,76 @@ export interface AboutPage {
     subtitle?: string | null;
   };
   intro?: string | null;
+  company?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    facts?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  stats?:
+    | {
+        value: number;
+        suffix?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  services?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    intro?: string | null;
+    items?:
+      | {
+          icon?:
+            | (
+                | 'globe'
+                | 'ship'
+                | 'warehouse'
+                | 'truck'
+                | 'document'
+                | 'flask'
+                | 'handshake'
+                | 'shield'
+                | 'clock'
+                | 'package'
+              )
+            | null;
+          title: string;
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  sectors?: {
+    title?: string | null;
+    text?: string | null;
+    items?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   story?:
     | {
         image: number | Media;
@@ -868,16 +938,32 @@ export interface AboutPage {
         id?: string | null;
       }[]
     | null;
-  timeline?:
+  valuesTitle?: string | null;
+  values?:
     | {
-        year: string;
+        icon?:
+          | (
+              | 'globe'
+              | 'ship'
+              | 'warehouse'
+              | 'truck'
+              | 'document'
+              | 'flask'
+              | 'handshake'
+              | 'shield'
+              | 'clock'
+              | 'package'
+            )
+          | null;
         title: string;
+        text?: string | null;
         id?: string | null;
       }[]
     | null;
-  values?:
+  timelineTitle?: string | null;
+  timeline?:
     | {
-        icon?: ('globe' | 'ship' | 'warehouse' | 'handshake' | 'shield' | 'clock') | null;
+        year: string;
         title: string;
         text?: string | null;
         id?: string | null;
@@ -886,6 +972,11 @@ export interface AboutPage {
   gallery?: {
     title?: string | null;
     images?: (number | Media)[] | null;
+  };
+  cta?: {
+    image?: (number | null) | Media;
+    title?: string | null;
+    text?: string | null;
   };
   meta?: {
     title?: string | null;
@@ -1257,6 +1348,55 @@ export interface AboutPageSelect<T extends boolean = true> {
         subtitle?: T;
       };
   intro?: T;
+  company?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        body?: T;
+        facts?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        suffix?: T;
+        label?: T;
+        id?: T;
+      };
+  services?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        intro?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  sectors?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+      };
   story?:
     | T
     | {
@@ -1265,17 +1405,20 @@ export interface AboutPageSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
-  timeline?:
-    | T
-    | {
-        year?: T;
-        title?: T;
-        id?: T;
-      };
+  valuesTitle?: T;
   values?:
     | T
     | {
         icon?: T;
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  timelineTitle?: T;
+  timeline?:
+    | T
+    | {
+        year?: T;
         title?: T;
         text?: T;
         id?: T;
@@ -1285,6 +1428,13 @@ export interface AboutPageSelect<T extends boolean = true> {
     | {
         title?: T;
         images?: T;
+      };
+  cta?:
+    | T
+    | {
+        image?: T;
+        title?: T;
+        text?: T;
       };
   meta?:
     | T
