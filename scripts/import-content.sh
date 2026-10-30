@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 SRC=deploy/content
 [ -f "$SRC/content.sql" ] || { echo "$SRC/content.sql bulunamadı"; exit 1; }
+grep -q '^COPY public.products ' "$SRC/content.sql"   || { echo "✗ $SRC/content.sql boş ya da eksik. Git'teki haline döndürün: git checkout -- $SRC"; exit 1; }
 
 echo "Tablo yapısının kurulmasını bekliyor..."
 for i in $(seq 1 60); do

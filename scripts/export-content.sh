@@ -6,7 +6,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 OUT=deploy/content
+# Yalnızca yerel geliştirme veritabanından paketlenir; sunucuda çalıştırılırsa paketi bozmadan çıkar.
+[ -f docker-compose.dev.yml ] && docker compose -f docker-compose.dev.yml ps -q postgres | grep -q . \
+  || { echo "✗ Yerel geliştirme veritabanı çalışmıyor. Bu betik sunucuda değil, yerel bilgisayarda çalıştırılır."; exit 1; }
 mkdir -p "$OUT"
+TMP=$(mktemp)
+trap 'rm -f "$TMP"' EXIT
 
 # Yalnızca veri: tablo yapısını sunucuda migration kurar.
 docker compose -f docker-compose.dev.yml exec -T postgres \
@@ -18,7 +23,9 @@ docker compose -f docker-compose.dev.yml exec -T postgres \
   --exclude-table-data=email_settings \
   | grep -v -E '^-- (Dumped|Started|Completed)|^\\(un)?restrict ' \
   | grep -v -E "setval\('public\.(users|users_sessions|payload_preferences|payload_preferences_rels|email_settings|payload_kv)_" \
-  > "$OUT/content.sql"
+  > "$TMP"
+grep -q '^COPY public.products ' "$TMP" || { echo "✗ Döküm eksik görünüyor; paket değiştirilmedi."; exit 1; }
+mv "$TMP" "$OUT/content.sql"
 
 rm -rf "$OUT/media"
 cp -r media "$OUT/media"
