@@ -1,5 +1,5 @@
 import { BRAND_NAME } from '@/lib/brand'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Mail, MapPin, Phone, Printer } from 'lucide-react'
 import Link from 'next/link'
 
 import { mediaUrl } from '@/components/MediaImage'
@@ -73,6 +73,14 @@ export function Footer({ locale, t, settings }: { locale: Locale; t: Dictionary;
               </a>
             </li>
           ))}
+          {settings.fax && (
+            <li className="flex gap-3">
+              <Printer className="h-4 w-4 shrink-0 text-brand-400" />
+              <span>
+                {t.contactCards.fax}: {settings.fax}
+              </span>
+            </li>
+          )}
           {settings.emails?.map((e) => (
             <li key={e.id ?? e.email} className="flex gap-3">
               <Mail className="h-4 w-4 shrink-0 text-brand-400" />
@@ -86,7 +94,7 @@ export function Footer({ locale, t, settings }: { locale: Locale; t: Dictionary;
       <div className="border-t border-white/10">
         <div className="container-x flex flex-wrap items-center justify-between gap-3 py-6 text-xs text-white/40">
           <p>
-            © {new Date().getFullYear()} {settings.siteName ?? BRAND_NAME}. {t.rights}
+            © {new Date().getFullYear()} {settings.legalName || settings.siteName || BRAND_NAME}. {t.rights}
           </p>
           <Link href={href(locale, routes.privacy)} className="transition hover:text-white">
             {t.privacy}

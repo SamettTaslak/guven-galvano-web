@@ -20,6 +20,12 @@ export const SiteSettings: GlobalConfig = {
           label: { tr: 'Genel', en: 'General' },
           fields: [
             { name: 'siteName', type: 'text', defaultValue: BRAND_NAME, label: { tr: 'Site adı', en: 'Site name' } },
+            {
+              name: 'legalName',
+              type: 'text',
+              label: { tr: 'Ticari unvan', en: 'Legal name' },
+              admin: { description: { tr: 'Alt bilgideki telif satırında ve arama motoru bilgilerinde kullanılır.', en: 'Used in the footer copyright line and structured data.' } },
+            },
             text('tagline', { tr: 'Slogan', en: 'Tagline' }),
             image('logo', { tr: 'Logo (açık zemin)', en: 'Logo (light bg)' }),
             image('logoLight', { tr: 'Logo (koyu zemin)', en: 'Logo (dark bg)' }),
@@ -36,6 +42,7 @@ export const SiteSettings: GlobalConfig = {
               label: { tr: 'Telefonlar', en: 'Phones' },
               fields: [{ name: 'number', type: 'text', required: true, label: { tr: 'Numara', en: 'Number' } }],
             },
+            { name: 'fax', type: 'text', label: { tr: 'Faks', en: 'Fax' } },
             {
               name: 'emails',
               type: 'array',

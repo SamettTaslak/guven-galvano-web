@@ -46,6 +46,7 @@ export default async function ContactPage({
       title: t.contactCards.phone,
       lines: settings.phones.map((p) => p.number),
       href: (v: string) => `tel:${v.replace(/\s/g, '')}`,
+      extra: settings.fax ? `${t.contactCards.fax}: ${settings.fax}` : undefined,
     },
     settings.emails?.length && {
       icon: Mail,
@@ -53,7 +54,7 @@ export default async function ContactPage({
       lines: settings.emails.map((e) => e.email),
       href: (v: string) => `mailto:${v}`,
     },
-  ].filter(Boolean) as { icon: typeof Mail; title: string; lines: string[]; href?: (v: string) => string }[]
+  ].filter(Boolean) as { icon: typeof Mail; title: string; lines: string[]; href?: (v: string) => string; extra?: string }[]
 
   return (
     <>
@@ -77,6 +78,7 @@ export default async function ContactPage({
                 ),
               )}
             </div>
+            {c.extra && <p className="mt-3 text-sm text-steel-500">{c.extra}</p>}
           </Reveal>
         ))}
       </section>

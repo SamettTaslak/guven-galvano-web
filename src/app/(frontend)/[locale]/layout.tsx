@@ -62,7 +62,9 @@ export default async function LocaleLayout({
     logo: absoluteUrl('/brand/logo-dark.png'),
     description: settings.tagline || undefined,
     email: settings.emails?.[0]?.email,
+    legalName: settings.legalName || undefined,
     telephone: settings.phones?.[0]?.number,
+    faxNumber: settings.fax || undefined,
     address: settings.address ? { '@type': 'PostalAddress', streetAddress: settings.address.replace(/\n/g, ', ') } : undefined,
     sameAs: settings.socials?.map((s) => s.url).filter(Boolean),
   }

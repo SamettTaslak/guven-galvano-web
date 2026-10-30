@@ -1119,6 +1119,10 @@ export interface PrivacyPage {
 export interface SiteSetting {
   id: number;
   siteName?: string | null;
+  /**
+   * Used in the footer copyright line and structured data.
+   */
+  legalName?: string | null;
   tagline?: string | null;
   logo?: (number | null) | Media;
   logoLight?: (number | null) | Media;
@@ -1130,6 +1134,7 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  fax?: string | null;
   emails?:
     | {
         email: string;
@@ -1565,6 +1570,7 @@ export interface PrivacyPageSelect<T extends boolean = true> {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
+  legalName?: T;
   tagline?: T;
   logo?: T;
   logoLight?: T;
@@ -1576,6 +1582,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         number?: T;
         id?: T;
       };
+  fax?: T;
   emails?:
     | T
     | {

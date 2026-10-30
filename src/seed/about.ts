@@ -148,7 +148,8 @@ export async function applyAboutContent(payload: Payload) {
   const countries = new Set((home.routes ?? []).map((r) => r.label)).size
 
   const facts: { label: TrEn; value: TrEn }[] = [
-    { label: { tr: 'Merkez & depo', en: 'Head office & warehouse' }, value: { tr: 'Çatalca, İstanbul', en: 'Çatalca, Istanbul' } },
+    { label: { tr: 'Merkez', en: 'Head office' }, value: { tr: 'İkitelli OSB, Başakşehir / İstanbul', en: 'İkitelli OSB, Başakşehir / Istanbul' } },
+    { label: { tr: 'Depo', en: 'Warehouse' }, value: { tr: 'Çatalca / İstanbul', en: 'Çatalca / Istanbul' } },
     { label: { tr: 'Faaliyet alanı', en: 'Business' }, value: { tr: 'İthalat · İhracat · Toptan', en: 'Import · Export · Wholesale' } },
     {
       label: { tr: 'Ürün yelpazesi', en: 'Product range' },
