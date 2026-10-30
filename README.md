@@ -163,7 +163,7 @@ Site, sunucuda iki konteynerle çalışır: `web` (site + panel) ve `db` (Postgr
 ```bash
 bash scripts/export-content.sh
 ```
-`deploy-data/content.sql` ve `deploy-data/media.tar.gz` oluşur. Bu dosyalar git'e girmez (kullanıcı ve ayar bilgisi içerir); sunucuya scp vb. ile kopyalayın.
+`deploy/content/` klasörü (`content.sql` + `media/`) oluşur ve **git'e girer**; commit + push edin, sunucu `git pull` ile alır. Panel kullanıcıları, oturumlar, panel tercihleri ve e-posta (SMTP) ayarları pakete girmez; bunlar sunucuda kalır.
 
 **2) Sunucuda projeyi alın ve ayarları yazın:**
 ```bash
@@ -171,18 +171,13 @@ git clone https://github.com/SamettTaslak/guven-galvano-web.git && cd guven-galv
 cp .env.production.example .env   # PAYLOAD_SECRET (yereldeki ile aynı) ve POSTGRES_PASSWORD yazın
 ```
 
-**3) Derleyip başlatın** — ilk açılışta tablolar migration ile otomatik kurulur:
+**3) Kurun** — imajı derler, tabloları migration ile kurar, `deploy/content/` değiştiyse içeriği yükler:
 ```bash
-docker compose up -d --build
-docker compose logs -f web
+bash scripts/server-install.sh
 ```
+İçerik yüklemesi sunucuda panelden yapılmış içerik değişikliklerinin yerine geçer (yerel = asıl kaynak). Elle yüklemek için: `bash scripts/import-content.sh`.
 
-**4) İçeriği yükleyin** (`deploy-data/` klasörü proje klasöründe olmalı; mevcut içeriğin yerine geçer):
-```bash
-bash scripts/import-content.sh
-```
-
-**5) Nginx** — ch5.chainasc.com için sunucu bloğu (sertifika mevcut düzene göre, ör. certbot):
+**4) Nginx** — ch5.chainasc.com için sunucu bloğu (sertifika mevcut düzene göre, ör. certbot):
 ```nginx
 server {
     server_name ch5.chainasc.com;
@@ -202,6 +197,6 @@ server {
 }
 ```
 
-**Güncelleme:** `git pull && docker compose up -d --build` (yeni migration'lar açılışta uygulanır). Kod tarafında şema değişirse yerelde `npx payload migrate:create <ad>` ile migration üretilip commit edilmelidir.
+**Güncelleme:** yerelde `bash scripts/export-content.sh` → commit + push; sunucuda `git pull && bash scripts/server-install.sh` (yeni migration'lar açılışta uygulanır, içerik değiştiyse yüklenir). Kod tarafında şema değişirse yerelde `npx payload migrate:create <ad>` ile migration üretilip commit edilmelidir.
 
 **Yedek:** `docker compose exec -T db pg_dump -U galvano galvano > yedek.sql` ve medya birimi (`galvano-site_media`).

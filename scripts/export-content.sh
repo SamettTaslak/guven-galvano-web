@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
 # Yereldeki içeriği (veritabanı kayıtları + yüklenen medya) sunucuya taşımak için paketler.
 # Yerel bilgisayarda, proje klasöründe çalıştırın:  bash scripts/export-content.sh
-# Çıktı: deploy-data/content.sql ve deploy-data/media.tar.gz  (git'e girmez; gizli bilgi içerir)
+# Çıktı: deploy/content/content.sql ve deploy/content/media/  (git'e girer, sunucu git pull ile alır)
+# Kullanıcılar, oturumlar, panel tercihleri ve e-posta ayarları pakete girmez: bunlar sunucunun kendi verisidir.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-mkdir -p deploy-data
+OUT=deploy/content
+mkdir -p "$OUT"
 
-# Yalnızca veri: tablo yapısını sunucuda migration kurar. Migration kayıtları sunucunun kendi kaydıdır.
+# Yalnızca veri: tablo yapısını sunucuda migration kurar.
 docker compose -f docker-compose.dev.yml exec -T postgres \
   pg_dump -U galvano -d galvano --data-only --disable-triggers --no-owner --no-privileges \
   --exclude-table-data=payload_migrations --exclude-table-data=payload_locked_documents \
-  --exclude-table-data=payload_locked_documents_rels > deploy-data/content.sql
+  --exclude-table-data=payload_locked_documents_rels --exclude-table-data=payload_kv \
+  --exclude-table-data=users --exclude-table-data=users_sessions \
+  --exclude-table-data=payload_preferences --exclude-table-data=payload_preferences_rels \
+  --exclude-table-data=email_settings \
+  | grep -v -E '^-- (Dumped|Started|Completed)|^\\(un)?restrict ' \
+  | grep -v -E "setval\('public\.(users|users_sessions|payload_preferences|payload_preferences_rels|email_settings|payload_kv)_" \
+  > "$OUT/content.sql"
 
-tar -czf deploy-data/media.tar.gz -C media .
+rm -rf "$OUT/media"
+cp -r media "$OUT/media"
 
-echo "Hazır:"
-ls -lh deploy-data
-echo "Bu iki dosyayı sunucuda proje klasöründeki deploy-data/ altına kopyalayıp scripts/import-content.sh çalıştırın."
+echo "Hazır: $OUT ($(du -sh "$OUT" | cut -f1))"
+echo "git add deploy/content && git commit && git push; sunucuda: git pull && bash scripts/server-install.sh"

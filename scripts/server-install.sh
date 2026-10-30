@@ -2,7 +2,8 @@
 # Sunucuda tek komutla kurulum / güncelleme:  bash scripts/server-install.sh
 #   - deploy-data/server.env varsa .env olarak kullanılır (eski .env yedeklenir)
 #   - imaj derlenir, konteynerler başlatılır, site açılana kadar beklenir
-#   - deploy-data/content.sql varsa ve daha önce yüklenmediyse içerik yüklenir (bir kez)
+#   - deploy/content/ (git ile gelen içerik paketi) değiştiyse içerik yüklenir; panelde sunucuda yapılan
+#     içerik değişikliklerinin yerine geçer. Kullanıcılar ve e-posta ayarları korunur.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -36,15 +37,23 @@ done
 [ "${code:-}" = "200" ] || { echo "✗ Site yanıt vermedi. Kayıtlar: docker compose logs --tail 80 web"; exit 1; }
 echo "✓ Site 127.0.0.1:${PORT} üzerinde çalışıyor"
 
-if [ -f deploy-data/content.sql ] && [ ! -f deploy-data/.imported ]; then
-  bash scripts/import-content.sh
-  date > deploy-data/.imported
-  for i in $(seq 1 40); do
-    code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${PORT}/tr" || true)
-    [ "$code" = "200" ] && break
-    sleep 3
-  done
-  echo "✓ İçerik yüklendi"
+# İçerik paketinin parmak izi: SQL + medya dosya listesi ve boyutları.
+STAMP=deploy-data/.imported
+if [ -f deploy/content/content.sql ]; then
+  SUM=$( (cat deploy/content/content.sql; find deploy/content/media -type f -printf '%P %s
+' 2>/dev/null | sort) | sha256sum | cut -d' ' -f1)
+  if [ "$(cat "$STAMP" 2>/dev/null)" != "$SUM" ]; then
+    bash scripts/import-content.sh
+    mkdir -p deploy-data && echo "$SUM" > "$STAMP"
+    for i in $(seq 1 40); do
+      code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${PORT}/tr" || true)
+      [ "$code" = "200" ] && break
+      sleep 3
+    done
+    echo "✓ İçerik yüklendi"
+  else
+    echo "✓ İçerik güncel (yükleme atlandı)"
+  fi
 fi
 
 docker compose ps
